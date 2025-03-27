@@ -6,7 +6,6 @@ This project contains the solutions for the Advent of Code challenges. The solut
 
 ```
 advent-of-code/
-│
 ├── <year>/
 │   ├── <day>.cpp      # C++ source file for the solution of a specific day
 ├── a.out              # Compiled executable
@@ -28,7 +27,8 @@ This repository contains C++ solutions to the problems provided in the Advent of
 1. **Clone the repository**:
 
 ```bash
-git clone <repository-url> cd advent-of-code
+git clone https://github.com/sothearo-kay/advent-of-code.git
+cd advent-of-code
 ```
 
 2. **Compile the C++ code**: To compile the C++ solution, use the following command:
