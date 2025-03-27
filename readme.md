@@ -6,6 +6,7 @@ This project contains the solutions for the Advent of Code challenges. The solut
 
 ```
 advent-of-code/
+│
 ├── <year>/
 │   ├── <day>.cpp      # C++ source file for the solution of a specific day
 ├── a.out              # Compiled executable
