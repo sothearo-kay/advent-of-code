@@ -9,8 +9,8 @@ int main() {
   ifstream inFile("in.txt");
 
   vector<int> a, b;
-  int x, y;
 
+  int x, y;
   while (inFile >> x >> y) {
     a.push_back(x);
     b.push_back(y);
