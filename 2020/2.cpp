@@ -63,7 +63,6 @@ int main() {
         count(entry.password.begin(), entry.password.end(), entry.letter);
 
     if (occurrences >= entry.min && occurrences <= entry.max) {
-
       validCount++;
     }
   }
