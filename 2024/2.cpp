@@ -25,7 +25,7 @@ bool isSafeReport(const vector<int> &levels) {
   return true;
 }
 
-bool isSafeWithOneRemoval(vector<int> &levels) {
+bool isSafeWithOneRemoval(vector<int> levels) {
   if (isSafeReport(levels))
     return true;
 
