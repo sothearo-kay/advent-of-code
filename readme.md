@@ -35,7 +35,7 @@ cd advent-of-code
 2. **Compile the C++ code**: To compile the C++ solution, use the following command:
 
 ```bash
-g++ -std=c++11 <year>/<day>.cpp && ./a.out
+g++ -std=c++17 <year>/<day>.cpp && ./a.out
 ```
 
 3. **Input**: The program reads input from the file `in.txt`, which contains the data for the challenge.
