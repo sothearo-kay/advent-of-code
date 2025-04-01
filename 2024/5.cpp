@@ -1,7 +1,10 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <queue>
 #include <sstream>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 using namespace std;
@@ -81,11 +84,86 @@ bool checkRules(const vector<int> &list, const vector<pair<int, int>> rules) {
   return true;
 }
 
+// Fixes an invalid list by reordering it to satisfy the rules.
+/*
+   The approach:
+   - Create a set of nodes (pages) from the list.
+   - Build a graph for rules that apply (only if both A and B are present).
+   - Topologically sort the constrained numbers (using a min-heap for
+   stability).
+   - Then sort the original list based on this order.
+*/
+vector<int> fixList(const vector<int> &list,
+                    const vector<pair<int, int>> &rules) {
+  unordered_set<int> nodes(list.begin(), list.end());
+  unordered_map<int, vector<int>> graph;
+  unordered_map<int, int> inDegree;
+
+  // Initialize in-degree for each node.
+  for (int node : nodes) {
+    inDegree[node] = 0;
+  }
+
+  // Build graph edges for each rule (if both numbers appear in the list).
+  for (const auto &rule : rules) {
+    int A = rule.first, B = rule.second;
+    if (nodes.count(A) && nodes.count(B)) {
+      graph[A].push_back(B);
+      inDegree[B]++;
+    }
+  }
+
+  // Use a min-heap for nodes with in-degree 0 to achieve a stable order.
+  priority_queue<int, vector<int>, greater<int>> pq;
+  for (const auto &entry : inDegree) {
+    if (entry.second == 0)
+      pq.push(entry.first);
+  }
+
+  vector<int> sorted;
+  while (!pq.empty()) {
+    int node = pq.top();
+    pq.pop();
+    sorted.push_back(node);
+    for (int neighbor : graph[node]) {
+      inDegree[neighbor]--;
+      if (inDegree[neighbor] == 0)
+        pq.push(neighbor);
+    }
+  }
+
+  // If some nodes weren't included (due to cycles or disconnected parts)
+  // add them.
+  if (sorted.size() < nodes.size()) {
+    for (int node : nodes) {
+      if (find(sorted.begin(), sorted.end(), node) == sorted.end())
+        sorted.push_back(node);
+    }
+  }
+
+  // Create a ranking map from the topologically sorted order.
+  unordered_map<int, int> order;
+  for (int i = 0; i < sorted.size(); i++) {
+    order[sorted[i]] = i;
+  }
+
+  // Sort the original list based on the computed order.
+  // For numbers not in the ranking, assign a very high rank.
+  vector<int> fixedList = list;
+  sort(fixedList.begin(), fixedList.end(), [&](int a, int b) {
+    int rankA = order.count(a) ? order[a] : 1000000;
+    int rankB = order.count(b) ? order[b] : 1000000;
+    return rankA < rankB;
+  });
+
+  return fixedList;
+}
+
 int main() {
   string fileName = "in.txt";
   InputData input = readInput(fileName);
 
-  int listIndex = 1;
+  // --- Part 1
   int sumMiddleValues = 0;
 
   for (const auto &list : input.numberLists) {
@@ -97,7 +175,22 @@ int main() {
     }
   }
 
+  // -- Part 2
+  int sumMiddleValuesOfInvalid = 0;
+
+  for (const auto &list : input.numberLists) {
+    bool valid = checkRules(list, input.rules);
+
+    if (!valid) {
+      vector<int> fixedList = fixList(list, input.rules);
+      int middleIndex = (fixedList.size() - 1) / 2;
+      sumMiddleValuesOfInvalid += fixedList[middleIndex];
+    }
+  }
+
   cout << "Sum of middle elements of valid lists: " << sumMiddleValues << endl;
+  cout << "Sum of middle elements of fixed (invalid) lists: "
+       << sumMiddleValuesOfInvalid << endl;
 
   return 0;
 }
