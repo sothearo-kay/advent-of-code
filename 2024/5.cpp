@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -60,22 +61,43 @@ InputData readInput(const string &fileName) {
   return data;
 }
 
+// This function checks if a given list of numbers satisfies all the rules.
+// For each rule (A, B), we find A and B and ensure A comes before B.
+bool checkRules(const vector<int> &list, const vector<pair<int, int>> rules) {
+  for (const auto &rule : rules) {
+    int A = rule.first;
+    int B = rule.second;
+
+    // Find positions of A and B in the list
+    auto itA = find(list.begin(), list.end(), A);
+    auto itB = find(list.begin(), list.end(), B);
+
+    // Only if both are present do we check their order
+    if (itA != list.end() && itB != list.end() && itA >= itB) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 int main() {
   string fileName = "in.txt";
   InputData input = readInput(fileName);
 
-  cout << "Rules:" << endl;
-  for (const auto &rule : input.rules) {
-    cout << rule.first << "|" << rule.second << endl;
+  int listIndex = 1;
+  int sumMiddleValues = 0;
+
+  for (const auto &list : input.numberLists) {
+    bool valid = checkRules(list, input.rules);
+
+    if (valid && !list.empty()) {
+      int middleIndex = (list.size() - 1) / 2;
+      sumMiddleValues += list[middleIndex];
+    }
   }
 
-  cout << "\nNumber Lists:" << endl;
-  for (const auto &list : input.numberLists) {
-    for (int num : list) {
-      cout << num << " ";
-    }
-    cout << endl;
-  }
+  cout << "Sum of middle elements of valid lists: " << sumMiddleValues << endl;
 
   return 0;
 }
